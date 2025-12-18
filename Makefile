@@ -1,5 +1,8 @@
 #  Copyright 2021 Synology Inc.
 
+MAKEFLAGS = --warn-undefined-variables
+SHELL = bash
+
 REGISTRY_NAME=synology
 IMAGE_NAME=synology-csi
 IMAGE_VERSION=v1.2.1
@@ -19,11 +22,17 @@ BUILD_FLAGS="-s -w -extldflags \"-static\""
 .PHONY: all
 all: build
 
+.PHONY: help
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n   make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "     \033[36m%-18s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
 .PHONY: FORCE
 FORCE: ;
 
+##@ Build:
+
 .PHONY: build
-build: bin/synology-csi-driver bin/synocli
+build: bin/synology-csi-driver bin/synocli ## Compile the binaries.
 
 bin:
 	@mkdir -p $@
@@ -32,17 +41,25 @@ bin/synology-csi-driver: bin FORCE
 	@echo "Compiling $@…"
 	@$(BUILD_ENV) go build -v -ldflags $(BUILD_FLAGS) -o $@ ./
 
-.PHONY: docker-build
-docker-build:
-	docker build -f Dockerfile -t $(IMAGE_TAG) .
-
-.PHONY: docker-build-multiarch
-docker-build-multiarch:
-	docker buildx build -t $(IMAGE_TAG) --platform linux/amd64,linux/arm/v7,linux/arm64 . --push
-
 bin/synocli: bin FORCE
 	@echo "Compiling $@…"
 	@$(BUILD_ENV) go build -v -ldflags $(BUILD_FLAGS) -o $@ ./synocli
+
+.PHONY: clean
+clean: ## Remove all build artifacts.
+	-rm -rf ./bin
+
+##@ Docker:
+
+.PHONY: docker-build
+docker-build: ## Build the Docker image.
+	docker build -f Dockerfile -t $(IMAGE_TAG) .
+
+.PHONY: docker-build-multiarch
+docker-build-multiarch: ## Build and push the multi-architecture Docker image.
+	docker buildx build -t $(IMAGE_TAG) --platform linux/amd64,linux/arm/v7,linux/arm64 . --push
+
+##@ Test:
 
 $(GO_BIN)/golangci-lint:
 	@echo "Installing golangci-lint to $(GO_BIN)…"
@@ -53,11 +70,6 @@ lint: $(GO_BIN)/golangci-lint ## Run golangci-lint.
 	@$(GO_BIN)/golangci-lint run
 	
 .PHONY: test
-test:
+test: ## Run the unit tests.
 	go clean -testcache
 	go test -v ./test/...
-
-.PHONY: clean
-clean:
-	-rm -rf ./bin
-
