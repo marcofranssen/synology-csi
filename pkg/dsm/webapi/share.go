@@ -14,78 +14,99 @@ import (
 )
 
 type ShareInfo struct {
-	Name                string `json:"name"`     // required
-	VolPath             string `json:"vol_path"` // required
-	Desc                string `json:"desc"`
-	EnableShareCow      bool   `json:"enable_share_cow"` // field for create
-	EnableRecycleBin    bool   `json:"enable_recycle_bin"`
-	RecycleBinAdminOnly bool   `json:"recycle_bin_admin_only"`
-	Encryption          int    `json:"encryption"` // field for create
-	QuotaForCreate      *int64 `json:"share_quota,omitempty"`
-	QuotaValueInMB      int64  `json:"quota_value"`      // field for get
-	SupportSnapshot     bool   `json:"support_snapshot"` // field for get
-	Uuid                string `json:"uuid"`             // field for get
-	NameOrg             string `json:"name_org"`         // required for clone
+	// 16-byte fields (strings)
+	Name    string `json:"name"`     // required
+	VolPath string `json:"vol_path"` // required
+	Desc    string `json:"desc"`
+	Uuid    string `json:"uuid"`    // field for get
+	NameOrg string `json:"name_org"` // required for clone
+	// 8-byte fields (pointers, int64)
+	QuotaForCreate *int64 `json:"share_quota,omitempty"`
+	QuotaValueInMB int64  `json:"quota_value"` // field for get
+	// 4-byte or 8-byte fields (int)
+	Encryption int `json:"encryption"` // field for create
+	// 1-byte fields (bool)
+	EnableShareCow      bool `json:"enable_share_cow"`      // field for create
+	EnableRecycleBin    bool `json:"enable_recycle_bin"`
+	RecycleBinAdminOnly bool `json:"recycle_bin_admin_only"`
+	SupportSnapshot     bool `json:"support_snapshot"` // field for get
 }
 
 type ShareUpdateInfo struct {
-	Name           string `json:"name"`     // required
-	VolPath        string `json:"vol_path"` // required
+	// 16-byte fields (strings)
+	Name    string `json:"name"`     // required
+	VolPath string `json:"vol_path"` // required
+	// 8-byte fields (pointers)
 	QuotaForCreate *int64 `json:"share_quota,omitempty"`
 	// Add properties you want to update to shares here
 }
 
 type ShareSnapshotInfo struct {
-	Uuid             string `json:"ruuid"`
-	Time             string `json:"time"`
-	Desc             string `json:"desc"`
-	SnapSize         string `json:"snap_size"` // the complete size of the snapshot
-	Lock             bool   `json:"lock"`
-	ScheduleSnapshot bool   `json:"schedule_snapshot"`
+	// 16-byte fields (strings)
+	Uuid     string `json:"ruuid"`
+	Time     string `json:"time"`
+	Desc     string `json:"desc"`
+	SnapSize string `json:"snap_size"` // the complete size of the snapshot
+	// 1-byte fields (bool)
+	Lock             bool `json:"lock"`
+	ScheduleSnapshot bool `json:"schedule_snapshot"`
 }
 
 type ShareCreateSpec struct {
-	Name      string
+	// Structs
 	ShareInfo ShareInfo
+	// 16-byte fields (strings)
+	Name string
 }
 
 type ShareCloneSpec struct {
-	Name      string
-	Snapshot  string
+	// Structs
 	ShareInfo ShareInfo
+	// 16-byte fields (strings)
+	Name     string
+	Snapshot string
 }
 
 type ShareSnapshotCreateSpec struct {
+	// 16-byte fields (strings)
 	ShareName string
 	Desc      string
-	IsLocked  bool
+	// 1-byte fields (bool)
+	IsLocked bool
 }
 
 type SharePermissionSetSpec struct {
+	// 24-byte fields (slices)
+	Permissions []*SharePermission
+	// 16-byte fields (strings)
 	Name          string
 	UserGroupType string // "local_user"/"local_group"/"system"
-	Permissions   []*SharePermission
 }
 
 type SharePermission struct {
-	Name       string `json:"name"`
-	IsReadonly bool   `json:"is_readonly"`
-	IsWritable bool   `json:"is_writable"`
-	IsDeny     bool   `json:"is_deny"`
-	IsCustom   bool   `json:"is_custom,omitempty"`
-	IsAdmin    bool   `json:"is_admin,omitempty"` // field for list
+	// 16-byte fields (strings)
+	Name string `json:"name"`
+	// 1-byte fields (bool)
+	IsReadonly bool `json:"is_readonly"`
+	IsWritable bool `json:"is_writable"`
+	IsDeny     bool `json:"is_deny"`
+	IsCustom   bool `json:"is_custom,omitempty"`
+	IsAdmin    bool `json:"is_admin,omitempty"` // field for list
 }
 
 type NfsInfo struct {
-	EnableNfs           bool   `json:"enable_nfs"`
-	EnableNfsV4         bool   `json:"enable_nfs_v4"`
-	NfsV4Domain         string `json:"nfs_v4_domain"`
-	ReadSize            int    `json:"read_size"`
-	SupportEncryptShare int    `json:"support_encrypt_share"`
-	SupportMajorVer     int    `json:"support_major_ver"`
-	SupportMinorVer     int    `json:"support_minor_ver"`
-	UnixPriEnable       bool   `json:"unix_pri_enable"`
-	WriteSize           int    `json:"write_size"`
+	// 16-byte fields (strings)
+	NfsV4Domain string `json:"nfs_v4_domain"`
+	// 4-byte or 8-byte fields (int)
+	ReadSize            int `json:"read_size"`
+	SupportEncryptShare int `json:"support_encrypt_share"`
+	SupportMajorVer     int `json:"support_major_ver"`
+	SupportMinorVer     int `json:"support_minor_ver"`
+	WriteSize           int `json:"write_size"`
+	// 1-byte fields (bool)
+	EnableNfs     bool `json:"enable_nfs"`
+	EnableNfsV4   bool `json:"enable_nfs_v4"`
+	UnixPriEnable bool `json:"unix_pri_enable"`
 }
 
 func shareErrCodeMapping(errCode int, oriErr error) error {
@@ -379,6 +400,7 @@ func (dsm *DSM) SharePermissionList(shareName string, userGroupType string) ([]S
 
 // ----------------------- FileServ NFS SharePrivilege APIs -----------------------
 type SecurityFlavor struct {
+	// 1-byte fields (bool)
 	Kerbros          bool `json:"kerberos"`
 	KerbrosIntegrity bool `json:"kerberos_integrity"`
 	KerbrosPrivacy   bool `json:"kerberos_privacy"`
@@ -386,18 +408,23 @@ type SecurityFlavor struct {
 }
 
 type PrivilegeRule struct {
-	Async          bool           `json:"async"`
-	Client         string         `json:"client"`
-	Crossmnt       bool           `json:"crossmnt"`
-	Insecure       bool           `json:"insecure"`
-	Privilege      string         `json:"privilege"`
-	RootSquash     string         `json:"root_squash"`
+	// Structs
 	SecurityFlavor SecurityFlavor `json:"security_flavor"`
+	// 16-byte fields (strings)
+	Client     string `json:"client"`
+	Privilege  string `json:"privilege"`
+	RootSquash string `json:"root_squash"`
+	// 1-byte fields (bool)
+	Async    bool `json:"async"`
+	Crossmnt bool `json:"crossmnt"`
+	Insecure bool `json:"insecure"`
 }
 
 type SharePrivilege struct {
-	ShareName string          `json:"share_name"`
-	Rule      []PrivilegeRule `json:"rule"`
+	// 24-byte fields (slices)
+	Rule []PrivilegeRule `json:"rule"`
+	// 16-byte fields (strings)
+	ShareName string `json:"share_name"`
 }
 
 func (dsm *DSM) ShareNfsPrivilegeSave(privilege SharePrivilege) error {

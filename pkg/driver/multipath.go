@@ -107,12 +107,14 @@ func (t *tools) multipath_flush(devPath string) error {
 
 // Device contains information about a device
 type Device struct {
-	Name      string   `json:"name"`
-	Hctl      string   `json:"hctl"`
-	Children  []Device `json:"children"`
-	Type      string   `json:"type"`
-	Transport string   `json:"tran"`
-	Size      string   `json:"size,omitempty"`
+	// 24-byte fields (slices)
+	Children []Device `json:"children"`
+	// 16-byte fields (strings)
+	Name      string `json:"name"`
+	Hctl      string `json:"hctl"`
+	Type      string `json:"type"`
+	Transport string `json:"tran"`
+	Size      string `json:"size,omitempty"`
 }
 
 // returns a multipath device for the configured targets if it exists

@@ -9,23 +9,28 @@ import (
 )
 
 type DsmInfo struct {
+	// 16-byte fields (strings)
 	Hostname string `json:"hostname"`
 }
 
 type DsmSysInfo struct {
+	// 16-byte fields (strings)
 	Model       string `json:"model"`
 	FirmwareVer string `json:"firmware_ver"`
 	Serial      string `json:"serial"`
 }
 
 type NetworkInterface struct {
-	Ifname  string `json:"ifname"`
-	Ip      string `json:"ip"`
-	Mask    string `json:"mask"`
-	Speed   int    `json:"speed"`
-	Status  string `json:"status"`
-	Type    string `json:"type"`
-	UseDhcp bool   `json:"use_dhcp"`
+	// 16-byte fields (strings)
+	Ifname string `json:"ifname"`
+	Ip     string `json:"ip"`
+	Mask   string `json:"mask"`
+	Status string `json:"status"`
+	Type   string `json:"type"`
+	// 4-byte or 8-byte fields (int)
+	Speed int `json:"speed"`
+	// 1-byte fields (bool)
+	UseDhcp bool `json:"use_dhcp"`
 }
 
 func (dsm *DSM) DsmInfoGet() (*DsmInfo, error) {

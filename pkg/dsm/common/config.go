@@ -12,14 +12,18 @@ import (
 )
 
 type ClientInfo struct {
+	// 16-byte fields (strings)
 	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Https    bool   `yaml:"https"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	// 4-byte fields (int on 64-bit is typically 8 bytes, but `int` without size spec is platform-dependent)
+	Port int `yaml:"port"`
+	// 1-byte fields (bool)
+	Https bool `yaml:"https"`
 }
 
 type SynoInfo struct {
+	// 24-byte fields (slices)
 	Clients []ClientInfo `yaml:"clients"`
 }
 

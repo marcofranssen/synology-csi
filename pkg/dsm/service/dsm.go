@@ -23,6 +23,7 @@ import (
 )
 
 type DsmService struct {
+	// 8-byte fields (maps)
 	dsms map[string]*webapi.DSM
 }
 

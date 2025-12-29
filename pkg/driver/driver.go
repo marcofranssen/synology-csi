@@ -40,15 +40,18 @@ type IDriver interface {
 
 type Driver struct {
 	// *csicommon.CSIDriver
+	// 24-byte fields (slices)
+	csCap []*csi.ControllerServiceCapability
+	vCap  []*csi.VolumeCapability_AccessMode
+	nsCap []*csi.NodeServiceCapability
+	// 16-byte fields (strings, interfaces)
 	name       string
 	nodeID     string
 	version    string
 	endpoint   string
-	tools      tools
-	csCap      []*csi.ControllerServiceCapability
-	vCap       []*csi.VolumeCapability_AccessMode
-	nsCap      []*csi.NodeServiceCapability
 	DsmService interfaces.IDsmService
+	// 8-byte fields (structs with single field - executor is 8 bytes)
+	tools tools
 }
 
 func NewControllerAndNodeDriver(nodeID string, endpoint string, dsmService interfaces.IDsmService, tools tools) (*Driver, error) {

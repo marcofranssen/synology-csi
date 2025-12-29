@@ -9,6 +9,7 @@ import (
 )
 
 type VolInfo struct {
+	// 16-byte fields (strings)
 	Name      string `json:"display_name"`
 	Path      string `json:"volume_path"`
 	Status    string `json:"status"`

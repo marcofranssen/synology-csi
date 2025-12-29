@@ -15,93 +15,120 @@ import (
 )
 
 type LunInfo struct {
-	Name             string         `json:"name"`
-	Uuid             string         `json:"uuid"`
-	LunType          int            `json:"type"`
-	Location         string         `json:"location"`
-	Size             uint64         `json:"size"`
-	Used             uint64         `json:"allocated_size"`
-	Status           string         `json:"status"`
-	FlashcacheStatus string         `json:"flashcache_status"`
-	IsActionLocked   bool           `json:"is_action_locked"`
-	DevAttribs       []LunDevAttrib `json:"dev_attribs"`
+	// 24-byte fields (slices)
+	DevAttribs []LunDevAttrib `json:"dev_attribs"`
+	// 16-byte fields (strings)
+	Name             string `json:"name"`
+	Uuid             string `json:"uuid"`
+	Location         string `json:"location"`
+	Status           string `json:"status"`
+	FlashcacheStatus string `json:"flashcache_status"`
+	// 8-byte fields (uint64)
+	Size uint64 `json:"size"`
+	Used uint64 `json:"allocated_size"`
+	// 4-byte or 8-byte fields (int)
+	LunType int `json:"type"`
+	// 1-byte fields (bool)
+	IsActionLocked bool `json:"is_action_locked"`
 }
 
 type MappedLun struct {
-	LunUuid      string `json:"lun_uuid"`
-	MappingIndex int    `json:"mapping_index"`
+	// 16-byte fields (strings)
+	LunUuid string `json:"lun_uuid"`
+	// 4-byte or 8-byte fields (int)
+	MappingIndex int `json:"mapping_index"`
 }
 
 type ConncetedSession struct {
+	// 16-byte fields (strings)
 	Iqn string `json:"iqn"`
 	Ip  string `json:"ip"`
 }
 
 type NetworkPortal struct {
-	ControllerId  int    `json:"controller_id"`
+	// 16-byte fields (strings)
 	InterfaceName string `json:"interface_name"`
+	// 4-byte or 8-byte fields (int)
+	ControllerId int `json:"controller_id"`
 }
 
 type TargetInfo struct {
-	Name              string             `json:"name"`
-	Iqn               string             `json:"iqn"`
-	Status            string             `json:"status"`
-	MaxSessions       int                `json:"max_sessions"`
+	// 24-byte fields (slices)
 	MappedLuns        []MappedLun        `json:"mapped_luns"`
 	ConnectedSessions []ConncetedSession `json:"connected_sessions"`
 	NetworkPortals    []NetworkPortal    `json:"network_portals"`
-	TargetId          int                `json:"target_id"`
+	// 16-byte fields (strings)
+	Name   string `json:"name"`
+	Iqn    string `json:"iqn"`
+	Status string `json:"status"`
+	// 4-byte or 8-byte fields (int)
+	MaxSessions int `json:"max_sessions"`
+	TargetId    int `json:"target_id"`
 }
 
 type SnapshotInfo struct {
+	// 16-byte fields (strings)
 	Name       string `json:"name"`
 	Uuid       string `json:"uuid"`
 	ParentUuid string `json:"parent_uuid"`
 	Status     string `json:"status"`
-	TotalSize  int64  `json:"total_size"`
-	CreateTime int64  `json:"create_time"`
 	RootPath   string `json:"root_path"`
+	// 8-byte fields (int64)
+	TotalSize  int64 `json:"total_size"`
+	CreateTime int64 `json:"create_time"`
 }
 
 type LunDevAttrib struct {
+	// 16-byte fields (strings)
 	DevAttrib string `json:"dev_attrib"`
-	Enable    int    `json:"enable"`
+	// 4-byte or 8-byte fields (int)
+	Enable int `json:"enable"`
 }
 
 type LunCreateSpec struct {
+	// 24-byte fields (slices)
+	DevAttribs []LunDevAttrib
+	// 16-byte fields (strings)
 	Name        string
 	Description string
 	Location    string
-	Size        int64
 	Type        string
-	DevAttribs  []LunDevAttrib
+	// 8-byte fields (int64)
+	Size int64
 }
 
 type LunUpdateSpec struct {
-	Uuid    string
+	// 16-byte fields (strings)
+	Uuid string
+	// 8-byte fields (uint64)
 	NewSize uint64
 }
 
 type LunCloneSpec struct {
+	// 16-byte fields (strings)
 	Name       string
 	SrcLunUuid string
 	Location   string
 }
 
 type TargetCreateSpec struct {
+	// 16-byte fields (strings)
 	Name string
 	Iqn  string
 }
 
 type SnapshotCreateSpec struct {
+	// 16-byte fields (strings)
 	Name        string
 	LunUuid     string
 	Description string
 	TakenBy     string
-	IsLocked    bool
+	// 1-byte fields (bool)
+	IsLocked bool
 }
 
 type SnapshotCloneSpec struct {
+	// 16-byte fields (strings)
 	Name            string
 	SrcLunUuid      string
 	SrcSnapshotUuid string

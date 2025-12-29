@@ -24,6 +24,7 @@ import (
 )
 
 type identityServer struct {
+	// 8-byte fields (pointers)
 	Driver *Driver
 }
 
