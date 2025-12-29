@@ -30,9 +30,12 @@ type Executor interface {
 }
 
 type hostexec struct {
+	// 16-byte fields (interfaces)
 	Executor
+	// 8-byte fields (maps)
 	commandMap map[string]string
-	chrootDir  string
+	// 16-byte fields (strings)
+	chrootDir string
 }
 
 // New creates an instance of hostexec to execute commands in the given environment

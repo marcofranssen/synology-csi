@@ -42,12 +42,14 @@ import (
 )
 
 type nodeServer struct {
-	Driver     *Driver
-	Mounter    *mount.SafeFormatAndMount
+	// 16-byte fields (interfaces)
 	dsmService interfaces.IDsmService
-	Initiator  *initiatorDriver
 	Client     clientset.Interface
-	tools      tools
+	// 8-byte fields (pointers, structs)
+	Driver    *Driver
+	Mounter   *mount.SafeFormatAndMount
+	Initiator *initiatorDriver
+	tools     tools
 }
 
 func waitForDevicePathToExist(path string) error {

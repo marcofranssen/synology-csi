@@ -37,9 +37,11 @@ import (
 )
 
 type controllerServer struct {
-	Driver     *Driver
+	// 16-byte fields (interfaces)
 	dsmService interfaces.IDsmService
-	Initiator  *initiatorDriver
+	// 8-byte fields (pointers)
+	Driver    *Driver
+	Initiator *initiatorDriver
 }
 
 func getSizeByCapacityRange(capRange *csi.CapacityRange) (int64, error) {

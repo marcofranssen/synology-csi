@@ -47,8 +47,10 @@ func NewNonBlockingGRPCServer() NonBlockingGRPCServer {
 
 // NonBlocking server
 type nonBlockingGRPCServer struct {
-	wg     sync.WaitGroup
+	// 8-byte fields (pointers)
 	server *grpc.Server
+	// sync.WaitGroup contains internal state (3 int32 + mutex), keep after pointers
+	wg sync.WaitGroup
 }
 
 func (s *nonBlockingGRPCServer) Start(endpoint string, ids csi.IdentityServer, cs csi.ControllerServer, ns csi.NodeServer) {

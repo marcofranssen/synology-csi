@@ -18,29 +18,38 @@ import (
 )
 
 type DSM struct {
+	// 16-byte fields (strings)
 	Ip         string
-	Port       int
 	Username   string
 	Password   string
 	Sid        string
-	Https      bool
 	Controller string //new
+	// 4-byte or 8-byte fields (int - typically 8 bytes on 64-bit)
+	Port int
+	// 1-byte fields (bool)
+	Https bool
 }
 
 type errData struct {
+	// 4-byte or 8-byte fields (int)
 	Code int `json:"code"`
 }
 
 type dsmApiResp struct {
-	Success bool    `json:"success"`
-	Err     errData `json:"error"`
+	// Structs (keep together)
+	Err errData `json:"error"`
+	// 1-byte fields (bool)
+	Success bool `json:"success"`
 }
 
 type Response struct {
+	// 16-byte fields (any/interface)
+	Data any
+	// 4-byte or 8-byte fields (int)
 	StatusCode int
 	ErrorCode  int
-	Success    bool
-	Data       any
+	// 1-byte fields (bool)
+	Success bool
 }
 
 func (dsm *DSM) sendRequest(data string, apiTemplate interface{}, params url.Values, cgiPath string) (Response, error) {

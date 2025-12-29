@@ -30,17 +30,21 @@ import (
 )
 
 type initiatorDriver struct {
+	// 16-byte fields (strings)
 	chapUser     string
 	chapPassword string
-	tools        tools
+	// 8-byte fields (structs)
+	tools tools
 }
 
 type iscsiSession struct {
+	// 16-byte fields (strings)
 	Protocol string
-	Id       int32
 	Portal   string
 	Iqn      string
 	Name     string
+	// 4-byte fields (int32)
+	Id int32
 }
 
 const (
@@ -48,6 +52,7 @@ const (
 )
 
 type tools struct {
+	// 16-byte fields (interfaces)
 	executor hostexec.Executor
 }
 
